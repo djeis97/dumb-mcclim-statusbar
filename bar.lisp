@@ -99,11 +99,8 @@
         (local-time:format-timestring bar (local-time:now)
                                       :format local-time:+asctime-format+)))))
 
-
-(defun run-bar ()
-  (let* ((fm (clim:find-frame-manager :port (clim:find-port :server-path :clx-ttf)))
-         (frame (clim:make-application-frame 'bar :frame-manager fm))
-         (window (clim-clx::window (clim:sheet-mirror (clim:frame-top-level-sheet frame)))))
+(defmethod clim:note-frame-enabled :before ((fm clim-clx::clx-frame-manager) (frame bar))
+  (let ((window (clim-clx::window (clim:sheet-mirror (clim:frame-top-level-sheet frame)))))
     (xlib:change-property window
                           :_net_wm_state
                           (list
@@ -116,7 +113,11 @@
                           (list (xlib:intern-atom (xlib:window-display window) :_NET_WM_WINDOW_TYPE_DOCK))
                           :atom
                           32)
-    (xlib:change-property window :_net_wm_strut (list 0 0 30 0) :cardinal 32)
+    (xlib:change-property window :_net_wm_strut (list 0 0 30 0) :cardinal 32)))
+
+(defun run-bar ()
+  (let* ((fm (clim:find-frame-manager :port (clim:find-port :server-path :clx-ttf)))
+         (frame (clim:make-application-frame 'bar :frame-manager fm)))
     (flet ((run ()
              (unwind-protect
                   (clim-debugger:with-debugger () (clim:run-frame-top-level frame))
